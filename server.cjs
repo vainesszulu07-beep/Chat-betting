@@ -1,4 +1,3 @@
-// server.cjs
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -8,23 +7,23 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Serve static files from /public
+// Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Basic route
+// Default route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Realtime Tic-Tac-Toe logic
+// Tic-Tac-Toe room handling
 const rooms = {};
 
 io.on("connection", (socket) => {
-  console.log("✅ A user connected");
+  console.log("✅ User connected");
 
   socket.on("joinRoom", ({ username, room }) => {
     socket.join(room);
-    console.log(`${username} joined ${room}`);
+    console.log(`${username} joined room ${room}`);
 
     if (!rooms[room]) rooms[room] = [];
     rooms[room].push(socket.id);
@@ -39,10 +38,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("❌ A user disconnected");
+    console.log("❌ User disconnected");
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Use port 8000 for Koyeb (or fallback to local 3000)
+const PORT = process.env.PORT || 8000;
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
