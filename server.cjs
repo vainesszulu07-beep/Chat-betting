@@ -1,49 +1,25 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const path = require('path');
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
-const server = http.createServer(app);
+const server = createServer(app);
 const io = new Server(server);
 
+// Serve static files
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const ticTacRooms = {}; // roomName -> { board: [], turn: 'X' }
-
+// Websocket logic
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-
-  // Join room
-  socket.on('joinRoom', ({ username, room }) => {
-    socket.join(room);
-    console.log(`${username} joined room ${room}`);
-
-    // Initialize board if first player
-    if (!ticTacRooms[room]) {
-      ticTacRooms[room] = { board: ["","","","","","","","",""], turn: 'X', players: [] };
-    }
-    const roomData = ticTacRooms[room];
-    roomData.players.push(username);
-
-    // Assign symbol
-    let symbol = roomData.players.length === 1 ? 'X' : 'O';
-    socket.emit('symbolAssignment', symbol);
-
-    // Notify others
-    io.to(room).emit('updateBoard', roomData.board, roomData.turn);
-  });
-
-  // Handle move
-  socket.on('ticTacToeMove', ({ room, board, turn }) => {
-    if (!ticTacRooms[room]) return;
-    ticTacRooms[room].board = board;
-    ticTacRooms[room].turn = turn;
-    io.to(room).emit('updateBoard', board, turn);
-  });
-
-  // Disconnect
-  socket.on('disconnect', () => console.log('User disconnected:', socket.id));
+  console.log('New user connected');
+  socket.on('disconnect', () => console.log('User disconnected'));
 });
 
-server.listen(3000, () => console.log('Server running on http://localhost:3000'));
+// ✅ Use Render's PORT variable or fallback to 3000 locally
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
