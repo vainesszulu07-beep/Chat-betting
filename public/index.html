@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Tic-Tac-Toe Online</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background: #000;
+  font-family: 'Orbitron', sans-serif;
+  color: #0ff;
+}
+
+h1 {
+  font-size: 3em;
+  text-shadow: 0 0 10px #0ff;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+#turn { font-size: 1.5em; margin-bottom: 20px; }
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 15px;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 60px;
+  cursor: pointer;
+  border-radius: 15px;
+  box-shadow: 0 0 20px #0ff, 0 0 40px #0ff inset;
+  transition: all 0.2s;
+}
+
+.cell.X { color: #ff007f; text-shadow: 0 0 10px #ff007f; }
+.cell.O { color: #00ffea; text-shadow: 0 0 10px #00ffea; }
+
+#winnerOverlay {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.9);
+  display:none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color:white;
+  font-size:32px;
+  text-align:center;
+  z-index:10;
+}
+
+#winnerOverlay button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 22px;
+  cursor:pointer;
+  border:none;
+  border-radius:10px;
+  background:#0ff;
+  color:#000;
+  font-weight:bold;
+}
+
+#winnerOverlay button:hover {
+  background:#ff007f;
+  color:white;
+}
+</style>
+</head>
+<body>
+
+<h1>Neon Tic-Tac-Toe Online</h1>
+<div id="turn">Waiting for opponent...</div>
+<div id="board"></div>
+
+<div id="winnerOverlay">
+  <div id="winnerText"></div>
+  <button id="rematchBtn">Rematch</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+// Prompt user
+const username = prompt("Enter your username:") || "Player";
+const room = prompt("Enter room name:") || "default";
+socket.emit('joinRoom', { username, room });
+
+const boardEl = document.getElementById('board');
+const turnText = document.getElementById('turn');
+const winnerOverlay = document.getElementById('winnerOverlay');
+const winnerText = document.getElementById('winnerText');
+
+let board = ["","","","","","","","",""];
+let currentTurn = "X";
+let mySymbol = null;
+
+// Initialize board
+function createBoard() {
+  boardEl.innerHTML = "";
+  for(let i=0;i<9;i++){
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    if(board[i]!="") cell.classList.add(board[i]);
+    cell.textContent = board[i];
+    cell.onclick = () => makeMove(i);
+    boardEl.appendChild(cell);
+  }
+}
+createBoard();
+
+// Make move
+function makeMove(index){
+  if(mySymbol!==currentTurn) return; // Only your turn
+  if(board[index]!=="") return;
+  board[index] = mySymbol;
+  createBoard();
+  if(checkWin()) return;
+  currentTurn = mySymbol==="X"?"O":"X";
+  updateTurn();
+  socket.emit('ticTacToeMove', { room, board, turn: currentTurn });
+}
+
+// Update turn
+function updateTurn(){
+  if(mySymbol===null) turnText.textContent = "Waiting for opponent...";
+  else turnText.textContent = (mySymbol===currentTurn) ? "Your Turn" : "Opponent's Turn";
+}
+
+// Receive opponent move
+socket.on('updateTicTacToe', data => {
+  board = data.board;
+  currentTurn = data.turn;
+  createBoard();
+  updateTurn();
+});
+
+// Assign symbol
+socket.on('userJoined', data => {
+  if(!mySymbol) mySymbol = "X";
+  else mySymbol = "O";
+  updateTurn();
+});
+
+// Check win
+function checkWin(){
+  const winPatterns = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  for(const pattern of winPatterns){
+    const [a,b,c] = pattern;
+    if(board[a] && board[a]===board[b] && board[a]===board[c]){
+      showWinner(board[a]);
+      return true;
+    }
+  }
+  if(!board.includes("")) {
+    return false;
+  } else {
+    showWinner("Draw");
+    return true;
+  }
+}
+
+function showWinner(winner){
+  winnerOverlay.style.display="flex";
+  winnerText.textContent = winner==="Draw"?"It's a Draw!":`${winner} Wins! 🎉`;
+}
+
+document.getElementById('rematchBtn').onclick = () => {
+  board = ["","","","","","","","",""];
+  currentTurn = "X";
+  winnerOverlay.style.display="none";
+  createBoard();
+  updateTurn();
+  socket.emit('rematch', { room });
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+/* ======================
+   General Styles
+====================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background-color: #000;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+main#main-content {
+  margin-top: 70px;
+  padding: 20px;
+  min-height: 90vh;
+}
+
+/* ======================
+   Top Navbar
+====================== */
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #000;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #222;
+}
+
+#navbar .logo {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+  list-style: none;
+}
+
+.nav-links li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 5px 10px;
+  transition: 0.2s;
+  border-radius: 5px;
+}
+
+.nav-links li a:hover, .nav-links li a.active {
+  background-color: #e50914;
+}
+
+#loginBtn {
+  background-color: #e50914;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#loginBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #e50914;
+}
+
+/* ======================
+   Bottom Navigation Panel
+====================== */
+#bottom-panel {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #111;
+  padding: 10px 0;
+  border-top: 1px solid #222;
+  z-index: 999;
+}
+
+#bottom-panel a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 0.9em;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#bottom-panel a span {
+  font-size: 1.2em;
+}
+
+#bottom-panel a:hover {
+  color: #e50914;
+}
+
+/* ======================
+   Hero Section
+====================== */
+#hero {
+  position: relative;
+  margin: 20px 0;
+  text-align: center;
+}
+
+#hero img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+}
+
+.hero-text h1 {
+  font-size: 3em;
+  margin-bottom: 15px;
+}
+
+.btn-primary {
+  background-color: #e50914;
+  color: #fff;
+  padding: 10px 25px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #e50914;
+}
+
+/* ======================
+   Carousels & Cards
+====================== */
+.carousel-wrapper {
+  position: relative;
+  margin: 30px 0;
+}
+
+.games-carousel, .leaderboard-cards {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 10px 0;
+  scroll-behavior: smooth;
+}
+
+.games-carousel::-webkit-scrollbar, .leaderboard-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.game-card, .leader-card, .promo-card, .service-cards div {
+  flex: 0 0 auto;
+  width: 200px;
+  background: #111;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.game-card:hover, .leader-card:hover, .promo-card:hover, .service-cards div:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #e50914;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 40%;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.carousel-btn.prev { left: -15px; }
+.carousel-btn.next { right: -15px; }
+
+/* ======================
+   Chat Page
+====================== */
+.chat-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.users-list {
+  flex: 1;
+  background: #111;
+  padding: 15px;
+  border-radius: 10px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.chat-box {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  background: #111;
+  padding: 15px;
+  border-radius: 10px;
+  max-height: 500px;
+}
+
+.chat-box .messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.chat-box input {
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+  margin-bottom: 10px;
+}
+
+.chat-box button {
+  padding: 8px;
+  background: #e50914;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.chat-box button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #e50914;
+}
+
+/* ======================
+   Forms
+====================== */
+form input, form textarea {
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+}
+
+form button {
+  padding: 10px;
+  background: #e50914;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+form button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #e50914;
+}
+
+/* ======================
+   Footer
+====================== */
+footer {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 15px;
+  margin-top: 20px;
+}

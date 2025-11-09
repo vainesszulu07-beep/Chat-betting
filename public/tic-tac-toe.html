@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Tic-Tac-Toe Online</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background: #000;
+  font-family: 'Orbitron', sans-serif;
+  color: #0ff;
+}
+
+h1 {
+  font-size: 3em;
+  color: #0ff;
+  text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+  margin-bottom: 20px;
+}
+
+#turn {
+  font-size: 1.5em;
+  margin-bottom: 25px;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 15px;
+}
+
+.cell {
+  width: 100px; height: 100px;
+  background: #111;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 60px;
+  cursor: pointer;
+  box-shadow: 0 0 20px #0ff, 0 0 40px #0ff inset;
+  transition: all 0.2s ease;
+}
+
+.cell:hover { transform: scale(1.1); }
+
+.cell.X { color: #ff007f; }
+.cell.O { color: #00ffea; }
+
+#winnerOverlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.9);
+  display: none; flex-direction: column; justify-content: center; align-items: center;
+  color: white; font-size: 32px; text-align: center;
+}
+
+#winnerOverlay button {
+  margin-top: 20px; padding: 12px 24px;
+  font-size: 22px; cursor:pointer;
+  border:none; border-radius:10px; background:#0ff; color:#000;
+}
+</style>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<h1>Neon Tic-Tac-Toe Online</h1>
+<div id="turn">Waiting for opponent...</div>
+<div id="board"></div>
+
+<div id="winnerOverlay">
+  <div id="winnerText"></div>
+  <button onclick="rematch()">Rematch</button>
+  <button onclick="exitGame()">Exit</button>
+</div>
+
+<script>
+const socket = io();
+
+// Prompt for username and room
+let username = prompt("Enter your username");
+let room = prompt("Enter room name to join (or create)");
+
+// Join room
+socket.emit('joinGame', room);
+
+// Elements
+const boardEl = document.getElementById('board');
+const turnText = document.getElementById('turn');
+const winnerOverlay = document.getElementById('winnerOverlay');
+const winnerText = document.getElementById('winnerText');
+
+let board = ["","","","","","","","",""];
+let myTurn = false;
+let mySymbol = "";
+let gameOver = false;
+
+// Create board UI
+function createBoard() {
+  boardEl.innerHTML = "";
+  board.forEach((cell, i) => {
+    const div = document.createElement('div');
+    div.classList.add('cell');
+    div.dataset.index = i;
+    div.textContent = cell;
+    if(cell) div.classList.add(cell);
+    div.onclick = () => makeMove(i);
+    boardEl.appendChild(div);
+  });
+}
+
+// Make a move
+function makeMove(i){
+  if(!myTurn || gameOver || board[i]!="") return;
+  board[i] = mySymbol;
+  myTurn = false;
+  createBoard();
+  socket.emit('gameMove', { room, moveData: { index:i, symbol: mySymbol } });
+  turnText.textContent = "Opponent's turn...";
+}
+
+// Receive move from opponent
+socket.on('gameMove', ({ index, symbol }) => {
+  board[index] = symbol;
+  myTurn = (symbol !== mySymbol); // Your turn
+  createBoard();
+  turnText.textContent = myTurn ? "Your turn" : "Opponent's turn";
+  checkWinOnline();
+});
+
+// Game setup after joining
+socket.on('playerJoined', (otherUser) => {
+  if(!mySymbol){
+    // Assign symbols based on who joined first
+    mySymbol = otherUser === username ? "O" : "X";
+    myTurn = mySymbol === "X";
+    turnText.textContent = myTurn ? "Your turn" : "Opponent's turn";
+    createBoard();
+  }
+});
+
+// Check win
+function checkWinOnline(){
+  const winPatterns = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  for(const [a,b,c] of winPatterns){
+    if(board[a] && board[a]===board[b] && board[a]===board[c]){
+      showWinner(board[a]);
+      return true;
+    }
+  }
+  if(!board.includes("")){
+    showWinner("Draw");
+    return true;
+  }
+  return false;
+}
+
+// Show winner
+function showWinner(winner){
+  gameOver = true;
+  winnerOverlay.style.display = "flex";
+  winnerText.textContent = winner==="Draw"? "It's a Draw!" : `${winner} Wins! 🎉`;
+  if(winner!=="Draw") confetti({particleCount:400,spread:150,origin:{y:0.6}});
+}
+
+// Rematch & exit
+function rematch(){
+  board = ["","","","","","","","",""];
+  gameOver = false;
+  winnerOverlay.style.display = "none";
+  createBoard();
+  myTurn = mySymbol==="X"; // X always starts
+  turnText.textContent = myTurn ? "Your turn" : "Opponent's turn";
+}
+function exitGame(){ window.close(); }
+
+// Initialize
+createBoard();
+</script>
+</body>
+</html>

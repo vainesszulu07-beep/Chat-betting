@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crown Kings Draft Online</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+body {
+  margin: 0; background: #000; color: #fff; font-family: 'Poppins', sans-serif;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100vh;
+}
+#turn { margin-bottom: 10px; font-size: 18px; font-weight: bold; }
+#board {
+  display: grid;
+  grid-template-columns: repeat(8, 10vmin);
+  grid-template-rows: repeat(8, 10vmin);
+  position: relative;
+  border: 2px solid #333;
+  max-width: 80vmin;
+  max-height: 80vmin;
+  gap:2px;
+}
+.square { width: 10vmin; height: 10vmin; box-sizing: border-box; }
+.dark { background-color: #769656; }
+.light { background-color: #eeeed2; }
+.piece {
+  width: 8vmin; height: 8vmin;
+  border-radius: 50%;
+  position: absolute;
+  display: flex; justify-content: center; align-items: center;
+  font-weight: bold; font-size: 4vmin; color: gold;
+  cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  transition: top 0.3s ease, left 0.3s ease;
+}
+.red { background-color: #c00; }
+.black { background-color: #000; }
+.highlight { outline: 3px solid yellow; border-radius: 50%; }
+#winnerOverlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.8); display: none; flex-direction: column;
+  justify-content: center; align-items: center; color: white; font-size: 28px; text-align:center;
+}
+#winnerOverlay button {
+  margin: 10px; padding: 10px 20px; font-size: 20px;
+  border:none; border-radius:8px; cursor:pointer;
+  background: #4f46e5; color: #fff; transition:0.2s;
+}
+#winnerOverlay button:hover { background:#6366f1; }
+</style>
+</head>
+<body>
+
+<h1>Crown Kings Draft Online</h1>
+<div id="turn">Waiting for opponent...</div>
+<div id="board"></div>
+
+<div id="winnerOverlay">
+  <div id="winnerText"></div>
+  <button id="rematchBtn">Rematch</button>
+  <button id="exitBtn">Exit</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/draft-game.js"></script>
+</body>
+</html>

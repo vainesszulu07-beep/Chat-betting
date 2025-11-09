@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatBet - Lobby</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <div class="logo">ChatBet</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="games.html" class="active">Games</a></li>
+    <li><a href="wallet.html">Wallet</a></li>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="chat.html">Chat</a></li>
+    <li><a href="profile.html">Profile</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <button id="loginBtn">Login</button>
+</nav>
+
+<!-- Games Grid -->
+<main>
+  <div class="game-card">
+    <img src="https://images.unsplash.com/photo-1601933470717-4b6fdff2f6d8?auto=format&fit=crop&w=400&q=80" alt="Tic-Tac-Toe">
+    <p>Neon Tic-Tac-Toe</p>
+    <button onclick="openGame('tic-tac-toe.html')">Enter Room</button>
+  </div>
+  <div class="game-card">
+    <img src="https://via.placeholder.com/200x120" alt="Draft Game">
+    <p>Crown Kings Draft</p>
+    <button onclick="openGame('draft-game.html')">Enter Room</button>
+  </div>
+</main>
+
+<!-- Live Users -->
+<div id="liveUsers">
+  <h3>Live Users</h3>
+  <div id="userList"></div>
+</div>
+
+<!-- Chat Box -->
+<div id="chatBox">
+  <div id="messages"></div>
+  <div id="chatInput">
+    <input type="text" id="chatMessage" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- Game Modal -->
+<div id="gameModal">
+  <iframe id="gameFrame"></iframe>
+  <button onclick="closeGame()">Exit Room</button>
+</div>
+
+<script src="js/lobby.js"></script>
+</body>
+</html>
